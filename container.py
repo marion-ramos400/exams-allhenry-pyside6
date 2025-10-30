@@ -5,7 +5,9 @@ from PySide6.QtWidgets import (
     QPushButton,
     QGridLayout,
     QFileDialog,
+    QHBoxLayout,
 )
+from PySide6.QtGui import QIntValidator
 
 from employee.controller import EmployeeController
 
@@ -17,32 +19,46 @@ class MainContainer(QWidget):
 
         self.labelinputNumEmployees.setText('Number of Employees')
         self.inputNumEmployees = QLineEdit()
+        self.setIntValidator()
 
         self.btnFolder = QPushButton('Select Folder')
-        self.btnGenerate = QPushButton('Generate Data')
+        btnGenerate = QPushButton('Generate Data')
         btnExport = QPushButton('Export')
 
-        self.btnGenerate.clicked.connect(self.generateData)
+        btnGenerate.clicked.connect(self.generateData)
+
+
+        hLayout =  QHBoxLayout()
+        hLayout.addWidget(self.labelinputNumEmployees)
+        hLayout.addWidget(self.inputNumEmployees)
+        hLayout.addWidget(self.btnFolder)
+        hLayout.addWidget(btnGenerate)
+        hLayout.addWidget(btnExport)
 
         layout = QGridLayout()
-        layout.addWidget(self.labelinputNumEmployees, 0, 0)
-        layout.addWidget(self.inputNumEmployees, 0, 1)
-        layout.addWidget(self.btnFolder, 0, 2)
-        layout.addWidget(self.btnGenerate, 0, 3)
-        layout.addWidget(btnExport, 0, 4)
+        layout.addLayout(hLayout, 0, 0)
         layout.addWidget(self.labelLog, 1, 0)
 
         self.setLayout(layout)
 
-        self.emp_data = []
+        self.empData = []
 
-#        empControl = EmployeeController()
-#        pips = empControl.generateEmployees(100)
-#        for p in pips:
-#            print(p.salary, p.hire_date)
+        self.empControl = EmployeeController()
+
+    def setIntValidator(self):
+        intValidator = QIntValidator(0, 999999, self.inputNumEmployees)
+        self.inputNumEmployees.setValidator(intValidator)
 
     def generateData(self):
-        print('test click')
+        numEmp = self.inputNumEmployees.text()
+        if len(numEmp) < 1:
+            self.labelLog.setText('Please enter number of employees')
+            return
+        numEmp = int(numEmp)
+        self.empData = self.empControl.generateEmployees(numEmp)
+        for p in self.empData:
+            print(p.full_name, p.salary, p.hire_date)
+
 
 
 
