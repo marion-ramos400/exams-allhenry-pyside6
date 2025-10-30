@@ -14,22 +14,3 @@ class Employee:
         self.salary = salary
         self.hire_date = hire_date
 
-    def setEmpId(self, id):
-        self.emp_id = id
-        return self
-
-    def setFullName(self, name):
-        self.full_name = name
-        return self
-
-    def setDepartment(self, department):
-        self.department = department
-        return self
-
-    def setSalary(self, salary):
-        self.salary = salary
-        return self
-
-    def setHireDate(self, hire_date):
-        self.hire_date = hire_date
-        return self

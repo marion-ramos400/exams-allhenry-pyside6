@@ -9,3 +9,4 @@ class ERROR:
 
 class SUCCESS:
     DataGenerated = 'Data Generated'
+    FileGenerated = 'File Generated'

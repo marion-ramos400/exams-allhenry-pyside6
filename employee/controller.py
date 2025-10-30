@@ -2,9 +2,11 @@
 from employee.model import Employee
 from employee.department import randomDept
 import pandas as pd
+import openpyxl
 import names
 import datetime
 import random
+import os
 
 class EmployeeController:
     def __init__(self):
@@ -38,6 +40,33 @@ class EmployeeController:
 
         return out_date.date()
 
+    def exportToExcel(self, outDir, empData):
+        try:
+            df = pd.DataFrame([
+                emp.__dict__ for emp in empData
+            ])
+            fpath = os.path.join(outDir, 'employees.xlsx')
+            df.to_excel(fpath,
+                        sheet_name="Employees",
+                        index=False)
+
+            #fix column spacing
+            self.fixSheetSpacing(fpath, ["Employees",])
 
 
 
+            return True, ''
+        except Exception as e:
+            errinfo = e
+            if hasattr(e, 'message'):
+                errinfo = e.message
+            return False, f'Extraction Failed. {errinfo}'
+
+    def fixSheetSpacing(self, fpath, sheetNames):
+        wb = openpyxl.load_workbook(fpath)
+        for sheet in sheetNames:
+            ws = wb[sheet]
+            for col in ws.columns:
+                ws.column_dimensions[col[0].column_letter].auto_size = True
+
+        wb.save(fpath)

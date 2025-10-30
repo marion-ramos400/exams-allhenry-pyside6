@@ -93,7 +93,12 @@ class MainContainer(QWidget):
             self.showMsg(ERROR.NoEmployeeData)
             return
 
-    
+        success, errorMsg = self.empControl.exportToExcel(
+            self.fileDir, self.empData)
 
+        if not success:
+            self.showMsg(errorMsg)
+            return
 
+        self.showMsg(SUCCESS.FileGenerated)
 
