@@ -5,10 +5,6 @@ import pandas as pd
 import names
 import datetime
 import random
-#emp = Employee()
-#emp.setEmpId(23)
-#emp.setDepartment(Department.ADMINISTRATION)
-#print(emp.department)
 
 class EmployeeController:
     def __init__(self):

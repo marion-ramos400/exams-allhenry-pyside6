@@ -4,13 +4,19 @@ import sys
 
 from container import MainContainer
 
+
+
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle('Employee Data Generator')
 #        self.setFixedSize(QSize(400, 300))
-        container = MainContainer().getContainer()
+        container = MainContainer()
         self.setCentralWidget(container)
+
+
+    def testFunc(self):
+        print('is this working?')
 
 app = QApplication(sys.argv)
 
