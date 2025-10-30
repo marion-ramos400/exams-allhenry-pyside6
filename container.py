@@ -22,6 +22,7 @@ class MainContainer:
         self.btnGenerate = QPushButton('Generate Data')
         self.btnExport = QPushButton('Export')
 
+
         layout = QGridLayout()
         layout.addWidget(self.labelinputNumEmployees, 0, 0)
         layout.addWidget(self.inputNumEmployees, 0, 1)
@@ -33,12 +34,17 @@ class MainContainer:
         self.container = QWidget()
         self.container.setLayout(layout)
 
-        empControl = EmployeeController()
+        self.emp_data = []
+
+#        empControl = EmployeeController()
 #        pips = empControl.generateEmployees(100)
 #        for p in pips:
-#            print(p.department)
+#            print(p.salary, p.hire_date)
 
     def getContainer(self):
         return self.container
+
+#    def generate_data(self):
+
 
 
