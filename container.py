@@ -8,8 +8,10 @@ from PySide6.QtWidgets import (
     QHBoxLayout,
 )
 from PySide6.QtGui import QIntValidator
+import os
 
 from employee.controller import EmployeeController
+from messages import ERROR, SUCCESS
 
 class MainContainer(QWidget):
     def __init__(self):
@@ -21,17 +23,18 @@ class MainContainer(QWidget):
         self.inputNumEmployees = QLineEdit()
         self.setIntValidator()
 
-        self.btnFolder = QPushButton('Select Folder')
+        btnFolder = QPushButton('Select Folder')
         btnGenerate = QPushButton('Generate Data')
         btnExport = QPushButton('Export')
 
+        btnFolder.clicked.connect(self.openFolderBrowser)
         btnGenerate.clicked.connect(self.generateData)
-
+        btnExport.clicked.connect(self.exportData)
 
         hLayout =  QHBoxLayout()
         hLayout.addWidget(self.labelinputNumEmployees)
         hLayout.addWidget(self.inputNumEmployees)
-        hLayout.addWidget(self.btnFolder)
+        hLayout.addWidget(btnFolder)
         hLayout.addWidget(btnGenerate)
         hLayout.addWidget(btnExport)
 
@@ -42,23 +45,55 @@ class MainContainer(QWidget):
         self.setLayout(layout)
 
         self.empData = []
-
         self.empControl = EmployeeController()
+
+        self.fileDir = None
 
     def setIntValidator(self):
         intValidator = QIntValidator(0, 999999, self.inputNumEmployees)
         self.inputNumEmployees.setValidator(intValidator)
 
+    def showMsg(self, msg):
+        self.labelLog.setText(msg)
+
     def generateData(self):
         numEmp = self.inputNumEmployees.text()
         if len(numEmp) < 1:
-            self.labelLog.setText('Please enter number of employees')
+            self.showMsg(ERROR.NumEmployees)
             return
         numEmp = int(numEmp)
         self.empData = self.empControl.generateEmployees(numEmp)
-        for p in self.empData:
-            print(p.full_name, p.salary, p.hire_date)
+        if len(self.empData) > 0:
+            self.showMsg(SUCCESS.DataGenerated)
+        else:
+            self.showMsg(ERROR.NoDataGenerated)
 
+    def openFolderBrowser(self):
+        dialog = QFileDialog(self)
+        dialog.setDirectory(os.getcwd())
+        dialog.setFileMode(QFileDialog.FileMode.Directory)
+        if dialog.exec():
+            dirsRes = dialog.selectedFiles()
+            if len(dirsRes) > 1:
+                self.showMsg(ERROR.OneDirOnly)
+                return
+            if len(dirsRes) < 1:
+                self.showMsg(ERROR.NoDirSelected)
+                return
+            self.fileDir = dirsRes[0]
+
+    def exportData(self):
+        if not self.fileDir:
+            self.showMsg(ERROR.FolderNotSet)
+            return
+        if not self.inputNumEmployees.text():
+            self.showMsg(ERROR.NumEmployees)
+            return
+        if len(self.empData) < 1:
+            self.showMsg(ERROR.NoEmployeeData)
+            return
+
+    
 
 
 
