@@ -42,17 +42,25 @@ class EmployeeController:
 
     def exportToExcel(self, outDir, empData):
         try:
-            df = pd.DataFrame([
+            fpath = os.path.join(outDir, 'employees.xlsx')
+
+            # Employees DataFrame
+            dfEmp = pd.DataFrame([
                 emp.__dict__ for emp in empData
             ])
-            fpath = os.path.join(outDir, 'employees.xlsx')
-            df.to_excel(fpath,
-                        sheet_name="Employees",
-                        index=False)
 
-            #fix column spacing
-            self.fixSheetSpacing(fpath, ["Employees",])
+            # Summary DataFrame
+            dfSummary = dfEmp.groupby('department')['salary'].mean()
+            dfSummary.name = "Average Salary"
+            dfSummary = dfSummary.to_frame().T
+            dfSummary = dfSummary.round(2)
 
+
+            with pd.ExcelWriter(fpath) as writer:
+                dfEmp.to_excel(writer, sheet_name="Employees", index=False)
+                dfSummary.to_excel(writer, sheet_name="Summary")
+
+            self.cleanUpFile(fpath) #, ["Employees", "Summary"])
 
 
             return True, ''
@@ -62,11 +70,21 @@ class EmployeeController:
                 errinfo = e.message
             return False, f'Extraction Failed. {errinfo}'
 
-    def fixSheetSpacing(self, fpath, sheetNames):
+    def cleanUpFile(self, fpath):
         wb = openpyxl.load_workbook(fpath)
+        sheetNames = ["Employees", "Summary"]
+        self.addExportTime(wb, sheetNames[1])
+        self.fixColumnSpacing(wb, sheetNames)
+        wb.save(fpath)
+
+    def fixColumnSpacing(self, wb, sheetNames):
         for sheet in sheetNames:
             ws = wb[sheet]
             for col in ws.columns:
-                ws.column_dimensions[col[0].column_letter].auto_size = True
+                #ws.column_dimensions[col[0].column_letter].auto_size = True
+                ws.column_dimensions[col[0].column_letter].width = 20
 
-        wb.save(fpath)
+    def addExportTime(self, wb, sheet):
+        ws = wb[sheet]
+        for i in range(2): ws.append(('',''))
+        ws.append(('Exported At', datetime.datetime.now()))
